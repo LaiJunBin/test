@@ -11,11 +11,6 @@
 </head>
 
 <body>
-
-
-
-
-
 	<div id="container">
     	<h1>汽車共乘網站</h1>
         
