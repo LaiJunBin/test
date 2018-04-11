@@ -11,33 +11,50 @@
 <script>
 
 	$(function(){
-		
-		var maxLength = 4;
-		for(var i = 1 ; i <=maxLength;i++){
-			$.ajax({
-				url:'captcha/getText.php',
-				async:false,
-				success:function(result){
-					var img = document.createElement("img");
-					img.src = 'captcha/plot.php?code='+result;
-					$(img).attr('va',result);
-					$("#captchaImg").append(img);
-					$("#captcha").append("<div></div>");
+
+		function plotCaptcha(maxLength){
+			$("#captcha,#captchaImg").html('');
+			$("[name=captcha]").val('');
+			var code = [];
+			for(var i = 1 ; i <=maxLength;i++){
+				$.ajax({
+					url:'captcha/getText.php',
+					async:false,
+					success:function(result){
+						code.push(result);
+						var img = document.createElement("img");
+						img.src = 'captcha/plot.php?code='+result;
+						$(img).attr('va',result);
+						$("#captchaImg").append(img);
+						$("#captcha").append("<div></div>");
+					}
+				});
+			}
+			code.sort();
+			$("[name=ans]").val(code.join(''));
+			$("#captchaImg img").draggable({
+				snap:'#captcha div'	,
+				snapMode:'inner',
+				revert:'invalid'
+			});
+			$('#captcha div').droppable({
+				drop:function(event,ui){
+					var v = '';
+					ui.helper.appendTo(this).css({
+						'top':0,
+						'left':0	
+					});
+					
+					$("#captcha img").each(function(){
+						v+=$(this).attr('va');
+					});
+					$("[name=captcha]").val(v);
 				}
 			});
 		}
-		$("#captchaImg img").draggable({
-			snap:'#captcha div'	,
-			snapMode:'inner',
-			revert:'invalid'
-		});
-		$('#captcha div').droppable({
-			drop:function(event,ui){
-				ui.helper.appendTo(this).css({
-					'top':0,
-					'left':0	
-				});
-			}
+		plotCaptcha(4);
+		$("#captchaBtn").click(function(){
+			plotCaptcha(4);
 		});
 	});
 
@@ -50,6 +67,7 @@
 	<div id="container">
     	<h1>汽車共乘網站管理-登入</h1>
     	<a href="../" class="ui-button fill">回首頁</a>
+        <form method="post" action="loginProcess.php">
     	<table width="50%" border="0" align="center">
           <tr>
             <td>帳號</td>
@@ -83,7 +101,9 @@
             </td>
           </tr>
         </table>
-
+        <input type="hidden" name="ans" />
+        <input type="hidden" name="captcha" />
+</form>
 
     
     </div>
